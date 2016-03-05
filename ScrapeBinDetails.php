@@ -48,12 +48,30 @@ class ScrapeBinDetails {
         } else {
             $BinDetails = array();
             $BinDetails['address'] = $RootObj->find('div[id=pnlCollectionDetails] h3', 0)->plaintext;
-            $BinDetails['domestic'] = array(
-                'collection-day' => $RootObj->find('div[id=pnlCollectionDetails] p.domestic strong', 1)->plaintext,
-                'next-collection' => $RootObj->find('div[id=pnlCollectionDetails] p.domestic strong', 2)->plaintext
+            $BinTypes = array(
+                'domestic',
+                'brownbin',
+                'garden',
+                'paper'
             );
+            foreach($BinTypes as $BinType) {
+                $BinDetails[$BinType] = $this->parseBin($BinType, $RootObj);
+            }
             return $BinDetails;
         }
+    }
+
+    private function parseBin($BinType, $RootObj)
+    {
+        $NCollection = DateTime::createFromFormat(
+            'l, d F Y.',
+            $RootObj->find('div[id=pnlCollectionDetails] p.'. $BinType .' strong', 2)->plaintext,
+            new DateTimeZone('Europe/London') // Assuming Wigan Council account for Daylight Savings for this date
+        );
+        return array(
+            'collection-day' => $RootObj->find('div[id=pnlCollectionDetails] p.'. $BinType .' strong', 1)->plaintext,
+            'next-collection' => $NCollection->format(DateTime::ISO8601),
+        );
     }
 
 }
