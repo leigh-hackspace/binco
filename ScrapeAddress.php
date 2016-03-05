@@ -44,10 +44,12 @@ class ScrapeAddress {
         } else {
             $Addresses = array();
             foreach($RootObj->find('select[id=lbAddresses] option') as $Address) {
-                $Addresses[] = array(
-                    'uprn' => $Address->value,
-                    'address' => $Address->plaintext
-                );
+                if(strpos($Address->value, 'UPRN') !== false) {
+                    $Addresses[] = array(
+                        'uprn' => $Address->value,
+                        'address' => $Address->plaintext
+                    );
+                }
             }
             return $Addresses;
         }
