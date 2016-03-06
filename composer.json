@@ -1,7 +1,6 @@
 {
     "name": "leighhackspace/binco",
     "description": "Scrapes the Wigan Council Bin Website to get the next collection date",
-    "type": "library",
     "authors": [
         {
             "name": "Adam Prescott",
