@@ -29,7 +29,7 @@ class ScrapeAddress {
             $TechInfo .= "Headers:\n {$Headers}\n\n";
             $Body = (string) $response->getBody();
             $TechInfo .= "Body:\n {$Body}";
-            throw new Exception('We got a HTTP Error :( Technical Info: '.base64_encode($TechInfo));
+            throw new \Exception('We got a HTTP Error :( Technical Info: '.base64_encode($TechInfo));
         }
     }
 
@@ -39,7 +39,7 @@ class ScrapeAddress {
         $RootObj = str_get_html($Response);
         if($RootObj->find('select[id=lbAddresses]') == null) {
             $Error = $RootObj->find('form p.error span[id=lblError]', 0)->plaintext;
-            throw new Exception($Error);
+            throw new \Exception($Error);
         } else {
             $Addresses = array();
             $Addresses['EventValidation'] = $RootObj->find('form[id=Form1] input[id=__EVENTVALIDATION]', 0)->value;

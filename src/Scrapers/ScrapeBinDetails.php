@@ -34,7 +34,7 @@ class ScrapeBinDetails {
             $TechInfo .= "Headers:\n {$Headers}\n\n";
             $Body = (string) $response->getBody();
             $TechInfo .= "Body:\n {$Body}";
-            throw new Exception('We got a HTTP Error :( Technical Info: '.base64_encode($TechInfo));
+            throw new \Exception('We got a HTTP Error :( Technical Info: '.base64_encode($TechInfo));
         }
     }
 
@@ -45,7 +45,7 @@ class ScrapeBinDetails {
         if($RootObj->find('div[id=pnlCollectionDetails]') == null) {
             $body = base64_encode($Response);
             $Error = "Could not find the data, it's possible Wigan Council have updated their system\n{$body}";
-            throw new Exception($Error);
+            throw new \Exception($Error);
         } else {
             $BinDetails = array();
             $BinDetails['address'] = $RootObj->find('div[id=pnlCollectionDetails] h3', 0)->plaintext;
