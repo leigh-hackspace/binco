@@ -1,14 +1,13 @@
-<?php
-require_once 'vendor/autoload.php';
+<?php namespace BinCo\Scrapers;
 
-use GuzzleHttp\Client;
+use \GuzzleHttp\Client;
 
 class ScrapeAddress {
     
     public function __construct($PostCode)
     {
         $this->postcode = $PostCode;
-        $this->httpclient = new GuzzleHttp\Client();
+        $this->httpclient = new \GuzzleHttp\Client();
     }
 
     public function getAddresses()
@@ -43,6 +42,9 @@ class ScrapeAddress {
             throw new Exception($Error);
         } else {
             $Addresses = array();
+            $Addresses['EventValidation'] = $RootObj->find('form[id=Form1] input[id=__EVENTVALIDATION]', 0)->value;
+            $Addresses['ViewState'] = $RootObj->find('form[id=Form1] input[id=__VIEWSTATE]', 0)->value;
+
             foreach($RootObj->find('select[id=lbAddresses] option') as $Address) {
                 if(strpos($Address->value, 'UPRN') !== false) {
                     $Addresses[] = array(

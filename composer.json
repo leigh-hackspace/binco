@@ -1,5 +1,19 @@
 {
+    "name": "leighhackspace/binco",
+    "description": "Scrapes the Wigan Council Bin Website to get the next collection date",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Adam Prescott",
+            "email": "adam.prescott01@googlemail.com"
+        }
+    ],
+
     "require": {
         "guzzlehttp/guzzle": "^6.1"
+    },
+
+    "autoload": {
+        "psr-4": {"BinCo\\": "src/"}
     }
 }

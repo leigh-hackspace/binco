@@ -1,26 +1,27 @@
-<?php
-require_once 'vendor/autoload.php';
+<?php namespace BinCo\Scrapers;
 
-use GuzzleHttp\Client;
+use \GuzzleHttp\Client;
 
 class ScrapeBinDetails {
     
-    public function __construct($UPRN)
+    public function __construct($UPRN, $ASPData=false)
     {
         $this->UPRN = $UPRN;
-        $this->httpclient = new GuzzleHttp\Client();
+        $this->ASPData = $ASPData;
+        $this->httpclient = new \GuzzleHttp\Client();
     }
 
     public function getDetails()
     {
         try {
-            $response = $this->httpclient->request('POST', 'http://kinnear.wigan.gov.uk/bincollections/Default.aspx', array(
-                'form_params' => array(
-                    'lbAddresses' => $this->UPRN,
-                    '__VIEWSTATE' => require_once 'UPRNViewState.php',
-                    '__EVENTVALIDATION' => '/wEWKwK+wYPRCwL++IESAuGVvaUCAsvbsOcMAor0rfsEAor0rfsEAtflk4oOAtfl/7cHAvKOltYLAvKO4vMMAvKOzpgEAvKO2sUNAvKOpuEGAvKOso4OAvKOnqsHAvKO6tAIAvKO9v0BAoO/sMAJArHuxuMMArHu0ogEArHuvrQNArHuitEGArHulv4PArHu4psHArHuzsAIArHu2u0BArHupokJArHusrYCAtz3pNUGAtz3sPIPAtz3nJ8HAtz36MQIAtz39OEBAtz3wI4JAtz3uNcLAtz3rKoCAtz3kJkEAtz3hPwMAvuYl+UBAvuYi7gIAvuYz68CAvuY44IJAvuY29QLoss2yluI0z0nxSF+dZUevTE74mw='
-                )
-            ));
+            $form_params = array();
+            $form_params['lbAddresses'] = $this->UPRN;
+            $form_params['__VIEWSTATE'] = $this->ASPData === false ? require_once 'UPRNViewState.php' : $this->ASPData['ViewState'];
+            $form_params['__EVENTVALIDATION'] = $this->ASPData === false ? 
+                '/wEWKwK+wYPRCwL++IESAuGVvaUCAsvbsOcMAor0rfsEAor0rfsEAtflk4oOAtfl/7cHAvKOltYLAvKO4vMMAvKOzpgEAvKO2sUNAvKOpuEGAvKOso4OAvKOnqsHAvKO6tAIAvKO9v0BAoO/sMAJArHuxuMMArHu0ogEArHuvrQNArHuitEGArHulv4PArHu4psHArHuzsAIArHu2u0BArHupokJArHusrYCAtz3pNUGAtz3sPIPAtz3nJ8HAtz36MQIAtz39OEBAtz3wI4JAtz3uNcLAtz3rKoCAtz3kJkEAtz3hPwMAvuYl+UBAvuYi7gIAvuYz68CAvuY44IJAvuY29QLoss2yluI0z0nxSF+dZUevTE74mw=' 
+                : $this->ASPData['EventValidation'];
+
+            $response = $this->httpclient->request('POST', 'http://kinnear.wigan.gov.uk/bincollections/Default.aspx', array('form_params' => $form_params));
 
             if($response->getStatusCode() == 200) {
                 $BinDetails = $this->parseResponseBody((string) $response->getBody());
@@ -63,14 +64,14 @@ class ScrapeBinDetails {
 
     private function parseBin($BinType, $RootObj)
     {
-        $NCollection = DateTime::createFromFormat(
+        $NCollection = \DateTime::createFromFormat(
             'l, d F Y.',
             $RootObj->find('div[id=pnlCollectionDetails] p.'. $BinType .' strong', 2)->plaintext,
-            new DateTimeZone('Europe/London') // Assuming Wigan Council account for Daylight Savings for this date
+            new \DateTimeZone('Europe/London') // Assuming Wigan Council account for Daylight Savings for this date
         );
         return array(
             'collection-day' => $RootObj->find('div[id=pnlCollectionDetails] p.'. $BinType .' strong', 1)->plaintext,
-            'next-collection' => $NCollection->format(DateTime::ISO8601),
+            'next-collection' => $NCollection->format('Y-m-d'),
         );
     }
 
